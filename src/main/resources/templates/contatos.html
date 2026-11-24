@@ -1,0 +1,254 @@
+********************contatos.html ************************************************
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#2a69be">
+
+    <title>Meus contatos • Agenda Fácil</title>
+
+    <!-- Bootstrap: biblioteca CSS para criar páginas responsivas. -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <!-- Nossos estilos (src/main/resources/static/css/agenda.css). -->
+    <link rel="stylesheet" th:href="@{/css/agenda.css}" href="/css/agenda.css">
+</head>
+
+<body>
+
+    <!-- Ícones SVG (um único conjunto reaproveitado na página, sem biblioteca externa). -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <symbol id="i-livro" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M20 17v4H6.5A2.5 2.5 0 0 1 4 18.5"/></symbol>
+        <symbol id="i-mais" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+        <symbol id="i-busca" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+        <symbol id="i-telefone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></symbol>
+        <symbol id="i-email" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></symbol>
+        <symbol id="i-editar" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
+        <symbol id="i-lixeira" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></symbol>
+        <symbol id="i-usuarios" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></symbol>
+    </svg>
+
+    <!-- Barra superior do sistema. -->
+    <header class="topo">
+        <div class="container">
+
+            <a class="marca" th:href="@{/contatos}" href="/contatos">
+                <span class="marca-icone">
+                    <svg class="icone" aria-hidden="true"><use href="#i-livro"/></svg>
+                </span>
+                Agenda Fácil
+            </a>
+
+            <span class="topo-texto">Seus contatos organizados</span>
+
+        </div>
+    </header>
+
+    <main class="container pagina">
+
+        <!-- Cabeçalho da página. -->
+        <div class="cabecalho">
+
+            <div>
+                <h1 class="titulo">Meus contatos</h1>
+                <p class="subtitulo">Gerencie seus contatos em um só lugar.</p>
+            </div>
+
+            <a th:href="@{/contatos/novo}" href="/contatos/novo" class="btn btn-primary px-4">
+                <svg class="icone" aria-hidden="true"><use href="#i-mais"/></svg>
+                Novo contato
+            </a>
+
+        </div>
+
+        <!-- Busca (filtra a lista na própria página) e total de contatos. -->
+        <div class="ferramentas" th:unless="${#lists.isEmpty(contatos)}">
+
+            <label class="busca">
+                <span class="visually-hidden">Buscar contato</span>
+                <svg class="icone" aria-hidden="true"><use href="#i-busca"/></svg>
+                <input type="search" id="busca" placeholder="Buscar por nome, telefone ou e-mail"
+                       autocomplete="off">
+            </label>
+
+            <div class="total" aria-live="polite">
+                <svg class="icone" aria-hidden="true"><use href="#i-usuarios"/></svg>
+                <strong th:text="${total}">0</strong>
+                <span th:text="${total == 1} ? 'contato cadastrado' : 'contatos cadastrados'">contatos cadastrados</span>
+            </div>
+
+        </div>
+
+        <!-- Lista de contatos (vira cartões no celular). -->
+        <section class="painel" th:unless="${#lists.isEmpty(contatos)}">
+
+            <table class="lista">
+
+                <thead>
+                    <tr>
+                        <th scope="col">Contato</th>
+                        <th scope="col">Telefone</th>
+                        <th scope="col">E-mail</th>
+                        <th scope="col" class="text-end">Ações</th>
+                    </tr>
+                </thead>
+
+                <tbody id="corpo">
+
+                    <!-- th:each percorre a lista de contatos. -->
+                    <tr th:each="contato : ${contatos}">
+
+                        <td>
+                            <div class="pessoa">
+                                <!-- Avatar com a inicial do nome; a cor muda conforme o ID. -->
+                                <span class="avatar" aria-hidden="true"
+                                      th:style="'--h:' + ${(contato.id * 47) % 360}"
+                                      th:text="${#strings.isEmpty(contato.nome)} ? '?' : ${#strings.toUpperCase(#strings.substring(contato.nome, 0, 1))}">J</span>
+                                <span class="nome" th:text="${contato.nome}">João Silva</span>
+                            </div>
+                        </td>
+
+                        <td>
+                            <a class="info" th:href="${'tel:' + contato.telefone}" href="#">
+                                <svg class="icone" aria-hidden="true"><use href="#i-telefone"/></svg>
+                                <span th:text="${contato.telefone}">(11) 99999-0001</span>
+                            </a>
+                        </td>
+
+                        <td>
+                            <a class="info" th:href="${'mailto:' + contato.email}" href="#">
+                                <svg class="icone" aria-hidden="true"><use href="#i-email"/></svg>
+                                <span th:text="${contato.email}">joao@email.com</span>
+                            </a>
+                        </td>
+
+                        <td>
+                            <div class="acoes">
+
+                                <!-- Link para editar o contato. -->
+                                <a th:href="@{/contatos/editar/{id}(id=${contato.id})}" href="#"
+                                   class="btn btn-acao editar"
+                                   th:attr="aria-label='Editar ' + ${contato.nome}">
+                                    <svg class="icone" aria-hidden="true"><use href="#i-editar"/></svg>
+                                    Editar
+                                </a>
+
+                                <!-- Formulário POST para excluir (a confirmação aparece em um diálogo). -->
+                                <form th:action="@{/contatos/excluir/{id}(id=${contato.id})}" action="#"
+                                      method="post"
+                                      class="form-excluir"
+                                      th:attr="data-nome=${contato.nome}">
+
+                                    <button type="submit"
+                                            class="btn btn-acao excluir"
+                                            th:attr="aria-label='Excluir ' + ${contato.nome}">
+                                        <svg class="icone" aria-hidden="true"><use href="#i-lixeira"/></svg>
+                                        Excluir
+                                    </button>
+
+                                </form>
+
+                            </div>
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+            <!-- Aparece quando a busca não encontra ninguém. -->
+            <p class="sem-resultado" id="semResultado" hidden>
+                Nenhum contato encontrado para essa busca.
+            </p>
+
+        </section>
+
+        <!-- Mensagem quando não existem contatos. -->
+        <section class="painel vazio" th:if="${#lists.isEmpty(contatos)}">
+
+            <div class="vazio-ilustracao">
+                <svg class="icone" aria-hidden="true"><use href="#i-usuarios"/></svg>
+            </div>
+
+            <h2>Nenhum contato cadastrado ainda</h2>
+            <p>Clique em "Novo contato" para começar!</p>
+
+            <a th:href="@{/contatos/novo}" href="/contatos/novo" class="btn btn-primary px-4">
+                <svg class="icone" aria-hidden="true"><use href="#i-mais"/></svg>
+                Novo contato
+            </a>
+
+        </section>
+
+    </main>
+
+    <footer class="rodape">
+        Agenda Fácil • Organize seus contatos com simplicidade.
+    </footer>
+
+    <!-- Diálogo de confirmação (elemento nativo do HTML, não precisa de biblioteca). -->
+    <dialog id="dialogoExcluir" class="confirmar" aria-labelledby="dlgTitulo">
+        <div class="confirmar-icone">
+            <svg class="icone" aria-hidden="true"><use href="#i-lixeira"/></svg>
+        </div>
+        <h2 id="dlgTitulo">Excluir contato?</h2>
+        <p>Você vai excluir <strong id="dlgNome"></strong>. Essa ação não pode ser desfeita.</p>
+        <div class="confirmar-botoes">
+            <button type="button" class="btn btn-suave" id="dlgCancelar">Cancelar</button>
+            <button type="button" class="btn btn-perigo" id="dlgConfirmar">Sim, excluir</button>
+        </div>
+    </dialog>
+
+    <script>
+        // --- Busca: esconde as linhas que não combinam com o texto digitado. ---
+        const campoBusca = document.getElementById('busca');
+        const linhas = document.querySelectorAll('#corpo tr');
+        const semResultado = document.getElementById('semResultado');
+
+        if (campoBusca) {
+            campoBusca.addEventListener('input', () => {
+                const termo = campoBusca.value.trim().toLowerCase();
+                let visiveis = 0;
+
+                linhas.forEach(linha => {
+                    const mostrar = linha.textContent.toLowerCase().includes(termo);
+                    linha.hidden = !mostrar;
+                    if (mostrar) visiveis++;
+                });
+
+                semResultado.hidden = visiveis > 0;
+            });
+        }
+
+        // --- Exclusão: pede confirmação antes de enviar o formulário POST. ---
+        const dialogo = document.getElementById('dialogoExcluir');
+        let formularioAlvo = null;
+
+        document.querySelectorAll('.form-excluir').forEach(form => {
+            form.addEventListener('submit', evento => {
+                if (typeof dialogo.showModal !== 'function') {
+                    if (!confirm('Deseja realmente excluir este contato?')) evento.preventDefault();
+                    return;
+                }
+                evento.preventDefault();
+                formularioAlvo = form;
+                document.getElementById('dlgNome').textContent = form.dataset.nome;
+                dialogo.showModal();
+            });
+        });
+
+        document.getElementById('dlgCancelar').addEventListener('click', () => dialogo.close());
+        document.getElementById('dlgConfirmar').addEventListener('click', () => {
+            if (formularioAlvo) formularioAlvo.submit();
+        });
+        // Clicar fora do diálogo também fecha.
+        dialogo.addEventListener('click', e => { if (e.target === dialogo) dialogo.close(); });
+    </script>
+
+</body>
+</html>
